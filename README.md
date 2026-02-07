@@ -2,6 +2,7 @@
 
 [![Live Site](https://img.shields.io/badge/Demo-Live_Website-2ecc71?style=for-the-badge&logo=google-chrome&logoColor=white)](https://engali983.github.io/The_Holy_Qur-an/)
 [![GitHub](https://img.shields.io/badge/GitHub-Profile-white?style=for-the-badge&logo=github&logoColor=black)](https://github.com/engAli983)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Profile-0a66c2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ali-khaled-014b21344/)
 
 تطبيق ويب متكامل لقراءة القرآن الكريم بتصميم إسلامي كلاسيكي وتجربة مستخدم عصرية، يتيح للمستخدمين التنقل بين السور وحفظ العلامات المرجعية بألوان مختلفة.
 
