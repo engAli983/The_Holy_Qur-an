@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>المصحف الإلكتروني</title>
+    <!-- Google Fonts: Amiri & Lateef for traditional feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Lateef&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="quran-container">
+      <div class="header-decoration">
+        <div class="ornament left"></div>
+        <h1>القرآن الكريم</h1>
+        <div class="ornament right"></div>
+      </div>
+      
+      <div class="controls">
+        <select id="surahSelect">
+          <option value="" disabled selected>اختر السورة</option>
+        </select>
+        <button id="bookmarkBtn" class="btn-bookmark" title="الذهاب للعلامة المحفوظة">
+             🔖 الذهاب للعلامة
+        </button>
+      </div>
+
+      <div class="page-content">
+        <div class="bismillah" id="bismillahHeader">بسم الله الرحمن الرحيم</div>
+        <div id="ayahs" class="quran-text"></div>
+      </div>
+      
+      <div class="footer-decoration"></div>
+    </div>
+
+    <!-- Color Picker Popover -->
+    <div id="colorPicker" class="color-picker hidden">
+      <div class="color-option" data-color="gold" style="background: #d4af37;" title="ذهبي"></div>
+      <div class="color-option" data-color="red" style="background: #e74c3c;" title="أحمر"></div>
+      <div class="color-option" data-color="green" style="background: #2ecc71;" title="أخضر"></div>
+      <div class="color-option" data-color="blue" style="background: #3498db;" title="أزرق"></div>
+      <div class="color-option remove-option" id="removeBookmarkBtn" title="حذف">🗑️</div>
+    </div>
+
+    <!-- Bookmarks Modal -->
+    <div id="bookmarksModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>العلامات المحفوظة</h2>
+          <span class="close-modal" id="closeModal">&times;</span>
+        </div>
+        <ul id="bookmarksList" class="bookmarks-list">
+          <!-- Bookmarks will be injected here -->
+        </ul>
+      </div>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+</html>
