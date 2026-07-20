@@ -1,6 +1,6 @@
 {
   "name": "المصحف الإلكتروني",
-  "short_name": "القرآن",
+  "short_name": "مُصْحَفي",
   "description": "اقرأ القرآن الكريم بتجربة احترافية",
   "start_url": "./index.html",
   "display": "standalone",
