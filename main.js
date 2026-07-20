@@ -514,7 +514,7 @@ function playAudio(surahNum, ayahNum, surahName) {
   dom.audioAyahInfo.textContent = `${surahName || `سورة ${surahNum}`} — آية ${ayahNum}`;
 
   // Use alquran.cloud audio API
-  fetch(`https://api.alquran.cloud/v1/ayah/${ref}/audio/${reciter}`)
+  fetch(`https://api.alquran.cloud/v1/ayah/${ref}/${reciter}`)
     .then((r) => r.json())
     .then((d) => {
       dom.audioElement.src = d.data.audio;

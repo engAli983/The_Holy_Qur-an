@@ -400,7 +400,7 @@ body {
 /* Page info bar */
 .page-info-bar {
   display: flex; align-items: center; justify-content: space-between;
-  width: 100%; max-width: 740px;
+  width: 96%; max-width: 1040px;
   padding: 8px 20px;
   border-radius: var(--r-full);
   font-family: var(--font-ui); font-size: 0.82rem;
@@ -425,7 +425,7 @@ body {
    ══════════════════════════════════════════════ */
 .book-wrapper{
   position:relative; display:flex; align-items:stretch;
-  width:100%; max-width:740px;
+  width:96%; max-width:1040px;
 }
 .page-flip-zone {
   flex-shrink:0; width:52px;
@@ -542,9 +542,12 @@ body {
   font-family:var(--font-quran);
   font-size:1.85rem;
   line-height:2.75;
-  text-align:justify; text-align-last:center;
+  text-align:justify;
+  text-justify:inter-word;
+  text-align-last:center;
   color:var(--text-main);
-  direction:rtl; word-spacing:5px;
+  direction:rtl;
+  word-spacing:normal;
   overflow-y:auto;
   scrollbar-width:none;
 }
@@ -700,7 +703,7 @@ body {
    ══════════════════════════════════════════════ */
 .page-nav-footer {
   display:flex; align-items:center; justify-content:space-between;
-  width:100%; max-width:740px; gap:14px;
+  width:96%; max-width:1040px; gap:14px;
 }
 
 .btn-page-flip {
@@ -756,7 +759,7 @@ body {
 /* ══════════════════════════════════════════════
    LOADING SKELETON — Ornate
    ══════════════════════════════════════════════ */
-.loading-state{width:100%;max-width:740px;animation:fadeUp 0.3s ease;}
+.loading-state{width:96%;max-width:1040px;animation:fadeUp 0.3s ease;}
 .skeleton-page {
   min-height: 80vh;
   display:flex; flex-direction:column; align-items:center; gap:20px;
@@ -1126,25 +1129,28 @@ body {
    ══════════════════════════════════════════════ */
 @media(max-width:640px){
   :root{--sidebar-w:88vw;}
-  .navbar{padding:0 12px;}
+  .navbar{padding:0 10px;}
   .brand-ar{font-size:1.15rem;}
   .navbar-actions{gap:2px;}
   .btn-icon{width:34px;height:34px;font-size:0.82rem;}
-  .main-content{padding:12px 6px 86px;}
-  .mushaf-page{padding:20px 16px 48px;min-height:70vh;}
-  .page-body{font-size:1.45rem;line-height:2.4;}
-  .page-flip-zone{width:34px;}
-  .flip-arrow{font-size:1.7rem;}
-  .page-nav-footer{gap:6px;}
-  .btn-page-flip{padding:8px 14px;font-size:0.8rem;}
-  .page-jump-input{width:58px;}
-  .audio-player{padding:0 12px;gap:8px;}
+  .main-content{padding:10px 4px 80px; width:100%;}
+  .book-wrapper{width:100%;}
+  .page-flip-zone{display:none !important;}
+  .mushaf-page{padding:18px 12px 42px; min-height:68vh; border-radius:4px; outline:none; border-width:1px;}
+  .page-body{font-size:1.45rem; line-height:2.3; word-spacing: normal;}
+  .page-info-bar{width:100%; padding:6px 12px; font-size:0.75rem;}
+  .page-nav-footer{width:100%; gap:4px; padding:0 4px;}
+  .btn-page-flip{padding:8px 12px; font-size:0.78rem;}
+  .page-jump-input{width:54px; padding:5px 6px;}
+  .audio-player{padding:0 12px; gap:8px;}
   .audio-reciter{display:none;}
-  .welcome-ornament{font-size:3.5rem;}
-  .welcome-title{font-size:1.5rem;}
-  .modal-content{border-radius:var(--r-md);}
+  .welcome-ornament{font-size:3.2rem;}
+  .welcome-title{font-size:1.4rem;}
+  .modal-content{border-radius:var(--r-md); width:95%; max-height:85vh;}
 }
 @media(max-width:400px){
-  .page-body{font-size:1.28rem;line-height:2.2;}
-  .page-surah-name-band{font-size:0.95rem;padding:6px 14px;}
+  .mushaf-page{padding:14px 8px 36px;}
+  .page-body{font-size:1.26rem; line-height:2.1; word-spacing: normal;}
+  .page-surah-name-band{font-size:0.9rem; padding:5px 12px;}
+  .btn-page-flip{padding:6px 10px; font-size:0.75rem;}
 }
