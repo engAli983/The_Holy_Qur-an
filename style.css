@@ -845,7 +845,7 @@ body {
    ══════════════════════════════════════════════ */
 .color-picker {
   position:fixed; z-index:500;
-  display:flex; gap:8px; align-items:center;
+  display:flex; gap:8px; align-items:center; flex-wrap:nowrap;
   padding:10px 14px; border-radius:var(--r-lg);
   animation:scaleIn 0.16s ease;
 
@@ -880,7 +880,7 @@ body {
    ══════════════════════════════════════════════ */
 .ayah-actions-popover {
   position:fixed; z-index:500;
-  display:flex; gap:2px; padding:6px;
+  display:flex; gap:2px; padding:6px; flex-wrap:nowrap;
   border-radius:var(--r-md);
   animation:scaleIn 0.16s ease;
 

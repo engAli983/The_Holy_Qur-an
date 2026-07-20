@@ -240,15 +240,29 @@ const BISMILLAH_PATTERNS = [
 const BISMILLAH_DISPLAY = "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ";
 
 function stripBismillah(text) {
+  // Normalize to NFC (canonical composition) to handle diacritics ordering variations
+  const normText = text.normalize("NFC");
+  
   for (const pat of BISMILLAH_PATTERNS) {
-    const stripped = text.replace(pat, "").trim();
-    if (stripped.length < text.length) return stripped;
+    const normPat = new RegExp(pat.source.normalize("NFC"), pat.flags);
+    const stripped = normText.replace(normPat, "").trim();
+    if (stripped.length < normText.length) return stripped;
   }
-  // Last resort: if text starts with بِسۡمِ or بِسْمِ, strip up to ~45 chars
-  if (/^بِسۡ|^بِسْ/.test(text)) {
-    return text.replace(/^.{20,55}رَّحِيمِ[ۚ۞]?\s*/, "").trim();
+  
+  // Robust Fallback: Search for common final words of Bismillah (الرحيم) and slice there
+  const رحيم_words = ["الرَّحِيمِ", "ٱلرَّحِیمِ", "الرحيم", "ٱلرَّحِيمِ"];
+  for (const r of رحيم_words) {
+    const idx = normText.indexOf(r);
+    if (idx !== -1 && idx < 55) {
+      return normText.substring(idx + r.length).trim();
+    }
   }
-  return text;
+  
+  // Last resort regex slice
+  if (/^بِسۡ|^بِسْ|^بِ?سْمِ/.test(normText)) {
+    return normText.replace(/^.{18,55}(رَّحِيمِ|الرَّحِيمِ|ٱلرَّحِیمِ|الرحيم)[ۚ۞]?\s*/, "").trim();
+  }
+  return normText;
 }
 
 // ============================================================
@@ -397,15 +411,25 @@ window.onMarkerClick = function (event, surahNum, ayahNum) {
 function positionPopover(pop, target) {
   pop.style.visibility = "hidden";
   pop.classList.remove("hidden");
-  const rect   = target.getBoundingClientRect();
-  const pW     = pop.offsetWidth;
-  const pH     = pop.offsetHeight;
-  const scroll = window.scrollY;
+  const rect = target.getBoundingClientRect();
+  const pW   = pop.offsetWidth;
+  const pH   = pop.offsetHeight;
 
-  let top  = rect.top  + scroll - pH - 8;
+  // Use pure viewport coordinates (no scroll offsets) because popover is position: fixed
+  let top  = rect.top - pH - 10;
   let left = rect.left + (rect.width / 2) - (pW / 2);
 
-  if (top < scroll + 70) top = rect.bottom + scroll + 8;
+  // If popover goes off the top edge (above navbar (~62px)), place it below the target
+  if (top < 70) {
+    top = rect.bottom + 10;
+  }
+
+  // If popover goes off the bottom of the screen, push it upwards
+  if (top + pH > window.innerHeight - 10) {
+    top = window.innerHeight - pH - 10;
+  }
+
+  // Keep popover within horizontal bounds
   left = Math.max(8, Math.min(left, window.innerWidth - pW - 8));
 
   pop.style.top  = top  + "px";
