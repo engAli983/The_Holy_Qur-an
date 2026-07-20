@@ -148,23 +148,37 @@
 
       <!-- AUDIO PLAYER -->
       <div id="audioPlayer" class="audio-player hidden">
-        <div class="audio-info"><span id="audioAyahInfo">—</span></div>
-        <div class="audio-controls">
-          <button id="audioPrevBtn"      class="btn-audio-ctrl"><i class="fa-solid fa-backward-step"></i></button>
-          <button id="audioPlayPauseBtn" class="btn-audio-play"><i class="fa-solid fa-play"></i></button>
-          <button id="audioNextBtn"      class="btn-audio-ctrl"><i class="fa-solid fa-forward-step"></i></button>
-          <button id="audioCloseBtn"     class="btn-audio-ctrl"><i class="fa-solid fa-xmark"></i></button>
+        <!-- Audio timeline/progress bar -->
+        <div class="audio-progress-container">
+          <span id="audioCurrentTime" class="audio-time">0:00</span>
+          <input type="range" id="audioProgressBar" class="audio-progress" min="0" max="100" value="0" />
+          <span id="audioDuration" class="audio-time">0:00</span>
         </div>
-        <div class="audio-reciter">
-          <select id="reciterSelect">
-            <option value="ar.alafasy">مشاري العفاسي</option>
-            <option value="ar.abdulbasitmurattal">عبد الباسط عبد الصمد</option>
-            <option value="ar.hudhaify">علي الحذيفي</option>
-            <option value="ar.saadghamidi">سعد الغامدي</option>
-            <option value="ar.minshawi">محمد صديق المنشاوي</option>
-            <option value="ar.husary">محمود خليل الحصري</option>
-          </select>
+
+        <div class="audio-main-layout">
+          <div class="audio-info"><span id="audioAyahInfo">—</span></div>
+          
+          <div class="audio-controls">
+            <button id="audioRewindBtn"     class="btn-audio-ctrl" title="إرجاع 5 ثوانٍ"><i class="fa-solid fa-rotate-left"></i></button>
+            <button id="audioPrevBtn"       class="btn-audio-ctrl" title="الآية السابقة"><i class="fa-solid fa-backward-step"></i></button>
+            <button id="audioPlayPauseBtn"  class="btn-audio-play" title="تشغيل / إيقاف مؤقت"><i class="fa-solid fa-play"></i></button>
+            <button id="audioNextBtn"       class="btn-audio-ctrl" title="الآية التالية"><i class="fa-solid fa-forward-step"></i></button>
+            <button id="audioForwardBtn"    class="btn-audio-ctrl" title="تقديم 5 ثوانٍ"><i class="fa-solid fa-rotate-right"></i></button>
+            <button id="audioCloseBtn"      class="btn-audio-ctrl" title="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+
+          <div class="audio-reciter">
+            <select id="reciterSelect">
+              <option value="ar.alafasy">مشاري العفاسي</option>
+              <option value="ar.abdulbasitmurattal">عبد الباسط عبد الصمد</option>
+              <option value="ar.hudhaify">علي الحذيفي</option>
+              <option value="ar.saadghamidi">سعد الغامدي</option>
+              <option value="ar.minshawi">محمد صديق المنشاوي</option>
+              <option value="ar.husary">محمود خليل الحصري</option>
+            </select>
+          </div>
         </div>
+
         <audio id="audioElement"></audio>
       </div>
 

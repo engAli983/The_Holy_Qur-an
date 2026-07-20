@@ -904,16 +904,43 @@ body {
    AUDIO PLAYER — Dark Emerald
    ══════════════════════════════════════════════ */
 .audio-player {
-  position:fixed; bottom:0; left:0; right:0; height:var(--audio-h);
-  display:flex; align-items:center; gap:16px; padding:0 22px;
+  position:fixed; bottom:0; left:0; right:0;
+  display:flex; flex-direction:column;
   z-index:150;
   animation:slideUp 0.32s ease;
 
-  background: linear-gradient(135deg, #080f09, #0e2018, #080f09);
-  border-top: 1px solid rgba(212,175,55,0.2);
+  background: linear-gradient(135deg, #060c07, #0b1a13, #060c07);
+  border-top: 1px solid rgba(212,175,55,0.22);
   box-shadow: 0 -4px 30px rgba(0,0,0,0.5), 0 -1px 0 rgba(212,175,55,0.15);
 }
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+/* Seek Bar at the Top Edge */
+.audio-progress-container {
+  width:100%; display:flex; align-items:center; gap:12px;
+  padding:4px 22px;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid rgba(212,175,55,0.06);
+}
+.audio-progress {
+  flex:1; height:4px; accent-color:var(--gold-rich); cursor:pointer;
+  border-radius:2px; background:rgba(255,255,255,0.15);
+  border:none; outline:none; transition: height 0.15s ease;
+}
+.audio-progress:hover {
+  height: 6px;
+}
+.audio-time {
+  font-family:var(--font-ui); font-size:0.72rem; color:var(--gold-pale);
+  min-width:32px; text-align:center; opacity:0.85;
+}
+
+/* Audio Main Row */
+.audio-main-layout {
+  width:100%; display:flex; align-items:center; justify-content:space-between;
+  padding:12px 22px 14px; gap:16px;
+}
+
 .audio-info {
   flex:1; font-family:var(--font-quran); font-size:1rem;
   color:var(--gold-pale); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
@@ -921,7 +948,7 @@ body {
 .audio-controls{display:flex;align-items:center;gap:8px;}
 .btn-audio-ctrl {
   width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
-  display:flex; align-items:center; justify-content:center; font-size:0.95rem;
+  display:flex; align-items:center; justify-content:center; font-size:0.92rem;
   background:rgba(212,175,55,0.08); color:var(--gold-pale);
   border: 1px solid rgba(212,175,55,0.2);
   transition:all var(--ease);
@@ -931,8 +958,8 @@ body {
   box-shadow:0 0 12px rgba(212,175,55,0.25);
 }
 .btn-audio-play {
-  width:46px; height:46px; border-radius:50%; border:none; cursor:pointer;
-  display:flex; align-items:center; justify-content:center; font-size:1.1rem;
+  width:44px; height:44px; border-radius:50%; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; font-size:1.05rem;
   background: linear-gradient(135deg, var(--gold), var(--gold-dark));
   color:#fff; box-shadow:0 0 18px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,0.15);
   transition:all var(--ease);

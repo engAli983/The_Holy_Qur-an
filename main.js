@@ -99,6 +99,11 @@ const dom = {
   audioPlayPauseBtn:$("audioPlayPauseBtn"),
   audioNextBtn:     $("audioNextBtn"),
   audioCloseBtn:    $("audioCloseBtn"),
+  audioRewindBtn:   $("audioRewindBtn"),
+  audioForwardBtn:  $("audioForwardBtn"),
+  audioCurrentTime: $("audioCurrentTime"),
+  audioProgressBar: $("audioProgressBar"),
+  audioDuration:    $("audioDuration"),
   reciterSelect:    $("reciterSelect"),
   audioElement:     $("audioElement"),
   // Toast
@@ -537,26 +542,65 @@ function shareAyah({ text, surahName, ayahNum }) {
 // ============================================================
 // AUDIO
 // ============================================================
+let _preloaderAudio = new Audio();
+
+function getAbsoluteAyahNumber(surahNum, ayahNum) {
+  if (state.currentPageData && state.currentPageData.ayahs) {
+    const found = state.currentPageData.ayahs.find(
+      (a) => a.surah.number === surahNum && a.numberInSurah === ayahNum
+    );
+    if (found) return found.number;
+  }
+  let absoluteNumber = 0;
+  if (state.surahList) {
+    for (let i = 0; i < surahNum - 1; i++) {
+      const s = state.surahList[i];
+      if (s) absoluteNumber += s.numberOfAyahs;
+    }
+  }
+  return absoluteNumber + ayahNum;
+}
+
+function preloadNextAyah(surahNum, ayahNum, reciter) {
+  let nextAbsoluteNum = null;
+  if (state.currentPageData && state.currentPageData.ayahs) {
+    const allAyahs = state.currentPageData.ayahs;
+    const idx = allAyahs.findIndex((a) => a.surah.number === surahNum && a.numberInSurah === ayahNum);
+    if (idx !== -1 && idx < allAyahs.length - 1) {
+      nextAbsoluteNum = allAyahs[idx + 1].number;
+    }
+  }
+  if (!nextAbsoluteNum) {
+    const currentAbsolute = getAbsoluteAyahNumber(surahNum, ayahNum);
+    if (currentAbsolute && currentAbsolute < 6236) {
+      nextAbsoluteNum = currentAbsolute + 1;
+    }
+  }
+  if (nextAbsoluteNum) {
+    _preloaderAudio.src = `https://cdn.islamic.network/quran/audio/128/${reciter}/${nextAbsoluteNum}.mp3`;
+    _preloaderAudio.preload = "auto";
+  }
+}
+
 function playAudio(surahNum, ayahNum, surahName) {
   const reciter = dom.reciterSelect.value;
-  const ref     = `${surahNum}:${ayahNum}`;
+  const absoluteNum = getAbsoluteAyahNumber(surahNum, ayahNum);
 
-  state.audioAyah   = { surahNum, ayahNum, surahName };
+  state.audioAyah   = { surahNum, ayahNum, surahName, absoluteNum };
   state.audioPlaying = true;
 
   dom.audioPlayer.classList.remove("hidden");
   dom.audioPlayPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
   dom.audioAyahInfo.textContent = `${surahName || `سورة ${surahNum}`} — آية ${ayahNum}`;
 
-  // Use alquran.cloud audio API
-  fetch(`https://api.alquran.cloud/v1/ayah/${ref}/${reciter}`)
-    .then((r) => r.json())
-    .then((d) => {
-      dom.audioElement.src = d.data.audio;
-      dom.audioElement.load();
-      dom.audioElement.play().catch(() => showToast("⚠️ تعذر تشغيل الصوت"));
+  // Direct CDN URL for instant playback (no metadata API request)
+  dom.audioElement.src = `https://cdn.islamic.network/quran/audio/128/${reciter}/${absoluteNum}.mp3`;
+  dom.audioElement.load();
+  dom.audioElement.play()
+    .then(() => {
+      preloadNextAyah(surahNum, ayahNum, reciter);
     })
-    .catch(() => showToast("⚠️ خطأ في تحميل الصوت"));
+    .catch(() => showToast("⚠️ تعذر تشغيل الصوت"));
 }
 
 function togglePlayPause() {
@@ -575,14 +619,12 @@ function togglePlayPause() {
 function audioNext() {
   if (!state.audioAyah || !state.currentPageData) return;
   const { surahNum, ayahNum, surahName } = state.audioAyah;
-  // Find next ayah in current page data
   const allAyahs = state.currentPageData.ayahs;
   const idx = allAyahs.findIndex((a) => a.surah.number === surahNum && a.numberInSurah === ayahNum);
   if (idx !== -1 && idx < allAyahs.length - 1) {
     const next = allAyahs[idx + 1];
     playAudio(next.surah.number, next.numberInSurah, next.surah.name);
   } else {
-    // Next page
     loadPage(state.currentPage + 1, "next");
     setTimeout(() => {
       if (state.currentPageData) {
@@ -612,7 +654,30 @@ function closeAudio() {
   dom.audioPlayer.classList.add("hidden");
 }
 
+function formatTime(seconds) {
+  if (isNaN(seconds)) return "0:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
 dom.audioElement.addEventListener("ended", audioNext);
+
+dom.audioElement.addEventListener("timeupdate", () => {
+  if (dom.audioElement.duration) {
+    const cur = dom.audioElement.currentTime;
+    const dur = dom.audioElement.duration;
+    const percent = (cur / dur) * 100;
+    dom.audioProgressBar.value = percent;
+    dom.audioCurrentTime.textContent = formatTime(cur);
+  }
+});
+
+dom.audioElement.addEventListener("loadedmetadata", () => {
+  if (dom.audioElement.duration) {
+    dom.audioDuration.textContent = formatTime(dom.audioElement.duration);
+  }
+});
 
 // ============================================================
 // TOAST
@@ -748,6 +813,29 @@ function bindEvents() {
   dom.audioNextBtn.addEventListener("click", audioNext);
   dom.audioPrevBtn.addEventListener("click", audioPrev);
   dom.audioCloseBtn.addEventListener("click", closeAudio);
+  
+  dom.audioRewindBtn.addEventListener("click", () => {
+    dom.audioElement.currentTime = Math.max(0, dom.audioElement.currentTime - 5);
+  });
+  dom.audioForwardBtn.addEventListener("click", () => {
+    if (dom.audioElement.duration) {
+      dom.audioElement.currentTime = Math.min(dom.audioElement.duration, dom.audioElement.currentTime + 5);
+    }
+  });
+
+  dom.audioProgressBar.addEventListener("input", (e) => {
+    if (dom.audioElement.duration) {
+      const pct = e.target.value;
+      dom.audioElement.currentTime = (pct / 100) * dom.audioElement.duration;
+    }
+  });
+
+  dom.reciterSelect.addEventListener("change", () => {
+    if (state.audioAyah) {
+      const { surahNum, ayahNum, surahName } = state.audioAyah;
+      playAudio(surahNum, ayahNum, surahName);
+    }
+  });
 
   // Close popovers on outside click
   document.addEventListener("click", (e) => {
