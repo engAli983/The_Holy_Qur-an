@@ -3,59 +3,201 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>المصحف الإلكتروني</title>
-    <!-- Google Fonts: Amiri & Lateef for traditional feel -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Lateef&display=swap" rel="stylesheet">
+    <meta name="description" content="المصحف الإلكتروني - اقرأ القرآن الكريم صفحة بصفحة كالمصحف الحقيقي" />
+    <meta name="theme-color" content="#1a0f00" />
+    <title>المصحف الإلكتروني | القرآن الكريم</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Amiri:ital,wght@0,400;0,700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="quran-container">
-      <div class="header-decoration">
-        <div class="ornament left"></div>
-        <h1>القرآن الكريم</h1>
-        <div class="ornament right"></div>
+
+    <!-- ===== SIDEBAR OVERLAY ===== -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <h2 class="sidebar-title">فهرس السور</h2>
+        <button id="closeSidebar" class="btn-icon" title="إغلاق">✕</button>
       </div>
-      
-      <div class="controls">
-        <select id="surahSelect">
-          <option value="" disabled selected>اختر السورة</option>
-        </select>
-        <button id="bookmarkBtn" class="btn-bookmark" title="الذهاب للعلامة المحفوظة">
-             🔖 الذهاب للعلامة
-        </button>
+      <div class="sidebar-search">
+        <input type="search" id="surahSearch" placeholder="ابحث عن سورة..." autocomplete="off" />
+      </div>
+      <ul id="surahList" class="surah-list"></ul>
+    </aside>
+
+    <!-- ===== APP LAYOUT ===== -->
+    <div class="app-layout">
+
+      <!-- NAVBAR -->
+      <nav class="navbar">
+        <button id="openSidebar" class="btn-icon navbar-btn" title="فهرس السور">☰</button>
+
+        <div class="navbar-brand">
+          <span class="brand-ar">القرآن الكريم</span>
+        </div>
+
+        <div class="navbar-actions">
+          <button id="audioToggleBtn" class="btn-icon navbar-btn" title="تشغيل صوتي">🔊</button>
+          <button id="bookmarksNavBtn" class="btn-icon navbar-btn" title="العلامات المرجعية">🔖</button>
+          <button id="fontIncBtn" class="btn-icon navbar-btn" title="تكبير الخط">A+</button>
+          <button id="fontDecBtn" class="btn-icon navbar-btn" title="تصغير الخط">A−</button>
+          <button id="darkModeBtn" class="btn-icon navbar-btn" title="تبديل المظهر">🌙</button>
+        </div>
+      </nav>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content">
+
+        <!-- WELCOME SCREEN -->
+        <div id="welcomeScreen" class="welcome-screen">
+          <div class="welcome-ornament">﷽</div>
+          <h2 class="welcome-title">مرحباً بك في المصحف الإلكتروني</h2>
+          <p class="welcome-subtitle">604 صفحة • اختر سورة من الفهرس للبدء</p>
+          <button class="btn-open-sidebar" id="openSidebarWelcome">📖 افتح فهرس السور</button>
+        </div>
+
+        <!-- PAGE VIEW -->
+        <div id="pageView" class="page-view hidden">
+
+          <!-- PAGE INFO BAR (top) -->
+          <div class="page-info-bar">
+            <span id="pageJuzInfo" class="page-info-item">الجزء 1</span>
+            <div class="page-info-center">
+              <span id="pageSurahNames" class="page-surah-label"></span>
+            </div>
+            <span id="pageHizbInfo" class="page-info-item"></span>
+          </div>
+
+          <!-- BOOK WRAPPER (page + click zones) -->
+          <div class="book-wrapper">
+
+            <!-- LEFT FLIP ZONE (previous page in RTL = right physical) -->
+            <div class="page-flip-zone zone-prev" id="zoneLeft" title="الصفحة السابقة">
+              <span class="flip-arrow">›</span>
+            </div>
+
+            <!-- THE MUSHAF PAGE CARD -->
+            <div class="mushaf-page" id="mushafPage">
+              <!-- Corner ornaments -->
+              <div class="corner corner-tl"></div>
+              <div class="corner corner-tr"></div>
+              <div class="corner corner-bl"></div>
+              <div class="corner corner-br"></div>
+
+              <!-- Page Body -->
+              <div class="page-body" id="pageBody"></div>
+
+              <!-- Page Number -->
+              <div class="page-num-label" id="pageNumLabel">١</div>
+            </div>
+
+            <!-- RIGHT FLIP ZONE (next page) -->
+            <div class="page-flip-zone zone-next" id="zoneRight" title="الصفحة التالية">
+              <span class="flip-arrow">‹</span>
+            </div>
+
+          </div>
+
+          <!-- PAGE NAVIGATION FOOTER -->
+          <div class="page-nav-footer">
+            <button id="prevPageBtn" class="btn-page-flip" title="الصفحة السابقة">
+              <span>›</span> السابقة
+            </button>
+            <div class="page-counter-wrap">
+              <span id="pageCounter" class="page-counter">1</span>
+              <span class="page-total">/ 604</span>
+              <input type="number" id="pageJump" class="page-jump-input" min="1" max="604" placeholder="انتقل" title="انتقل إلى صفحة" />
+            </div>
+            <button id="nextPageBtn" class="btn-page-flip" title="الصفحة التالية">
+              التالية <span>‹</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- LOADING SKELETON -->
+        <div id="loadingState" class="loading-state hidden">
+          <div class="skeleton-page">
+            <div class="sk-line w60 center"></div>
+            <div class="sk-line w40 center"></div>
+            <div class="sk-divider"></div>
+            <div class="sk-line w100"></div>
+            <div class="sk-line w85"></div>
+            <div class="sk-line w100"></div>
+            <div class="sk-line w70"></div>
+            <div class="sk-line w95"></div>
+            <div class="sk-line w100"></div>
+            <div class="sk-line w80"></div>
+            <div class="sk-line w100"></div>
+            <div class="sk-line w65"></div>
+          </div>
+        </div>
+
+        <!-- ERROR STATE -->
+        <div id="errorState" class="error-state hidden">
+          <div class="error-icon">⚠️</div>
+          <p class="error-msg">حدث خطأ في التحميل. تحقق من اتصالك بالإنترنت.</p>
+          <button id="retryBtn" class="btn-retry">إعادة المحاولة</button>
+        </div>
+
+      </main>
+
+      <!-- AUDIO PLAYER -->
+      <div id="audioPlayer" class="audio-player hidden">
+        <div class="audio-info"><span id="audioAyahInfo">—</span></div>
+        <div class="audio-controls">
+          <button id="audioPrevBtn"      class="btn-audio-ctrl">⏮</button>
+          <button id="audioPlayPauseBtn" class="btn-audio-play">▶</button>
+          <button id="audioNextBtn"      class="btn-audio-ctrl">⏭</button>
+          <button id="audioCloseBtn"     class="btn-audio-ctrl">✕</button>
+        </div>
+        <div class="audio-reciter">
+          <select id="reciterSelect">
+            <option value="7">عبد الباسط عبد الصمد</option>
+            <option value="1">علي الحذيفي</option>
+            <option value="5">سعد الغامدي</option>
+            <option value="6">محمد صديق المنشاوي</option>
+          </select>
+        </div>
+        <audio id="audioElement"></audio>
       </div>
 
-      <div class="page-content">
-        <div class="bismillah" id="bismillahHeader">بسم الله الرحمن الرحيم</div>
-        <div id="ayahs" class="quran-text"></div>
-      </div>
-      
-      <div class="footer-decoration"></div>
     </div>
 
-    <!-- Color Picker Popover -->
+    <!-- COLOR PICKER POPOVER -->
     <div id="colorPicker" class="color-picker hidden">
-      <div class="color-option" data-color="gold" style="background: #d4af37;" title="ذهبي"></div>
-      <div class="color-option" data-color="red" style="background: #e74c3c;" title="أحمر"></div>
-      <div class="color-option" data-color="green" style="background: #2ecc71;" title="أخضر"></div>
-      <div class="color-option" data-color="blue" style="background: #3498db;" title="أزرق"></div>
-      <div class="color-option remove-option" id="removeBookmarkBtn" title="حذف">🗑️</div>
+      <div class="color-option" data-color="gold"  style="background:#d4af37;" title="ذهبي"></div>
+      <div class="color-option" data-color="green" style="background:#27ae60;" title="أخضر"></div>
+      <div class="color-option" data-color="blue"  style="background:#2980b9;" title="أزرق"></div>
+      <div class="color-option" data-color="red"   style="background:#e74c3c;" title="أحمر"></div>
+      <div class="color-option remove-option" id="removeBookmarkBtn" title="حذف العلامة">🗑️</div>
     </div>
 
-    <!-- Bookmarks Modal -->
+    <!-- AYAH ACTIONS POPOVER -->
+    <div id="ayahActions" class="ayah-actions-popover hidden">
+      <button class="ayah-action-btn" id="copyAyahBtn">📋 نسخ</button>
+      <button class="ayah-action-btn" id="shareAyahBtn">↗ مشاركة</button>
+      <button class="ayah-action-btn" id="listenAyahBtn">🔊 استماع</button>
+    </div>
+
+    <!-- BOOKMARKS MODAL -->
     <div id="bookmarksModal" class="modal hidden">
+      <div class="modal-backdrop"></div>
       <div class="modal-content">
         <div class="modal-header">
-          <h2>العلامات المحفوظة</h2>
-          <span class="close-modal" id="closeModal">&times;</span>
+          <h2 class="modal-title">🔖 العلامات المرجعية</h2>
+          <button class="btn-icon" id="closeModal">✕</button>
         </div>
-        <ul id="bookmarksList" class="bookmarks-list">
-          <!-- Bookmarks will be injected here -->
-        </ul>
+        <ul id="bookmarksList" class="bookmarks-list"></ul>
       </div>
     </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast hidden"></div>
 
     <script src="main.js"></script>
   </body>

@@ -1,0 +1,24 @@
+{
+  "name": "المصحف الإلكتروني",
+  "short_name": "القرآن",
+  "description": "اقرأ القرآن الكريم بتجربة احترافية",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d0800",
+  "theme_color": "#c9a227",
+  "orientation": "portrait-primary",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f54c.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f54c.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
