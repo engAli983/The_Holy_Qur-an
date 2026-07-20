@@ -1,4 +1,4 @@
-const CACHE_NAME = "quran-mushaf-cache-v2";
+const CACHE_NAME = "quran-mushaf-cache-v4";
 
 // Assets to cache immediately on install (App Shell)
 const STATIC_ASSETS = [

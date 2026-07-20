@@ -4,6 +4,26 @@
    نظام صفحات (604 صفحة) كالمصحف الحقيقي
    ============================================================ */
 
+// Cache Invalidation Check (Forces fresh load for new PWA code updates)
+const APP_VERSION = "v4";
+if (localStorage.getItem("app_cache_version") !== APP_VERSION) {
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+      for (let reg of regs) reg.unregister();
+    });
+  }
+  if (window.caches) {
+    caches.keys().then((keys) => {
+      Promise.all(keys.map((key) => caches.delete(key))).then(() => {
+        localStorage.removeItem("quranFullySynced");
+        localStorage.removeItem("quranSyncedPagesCount");
+        localStorage.setItem("app_cache_version", APP_VERSION);
+        location.reload();
+      });
+    });
+  }
+}
+
 // ============================================================
 // SURAH START PAGES — Medina Mushaf (Hafs 'an 'Asim)
 // Index = surah number (1-114), value = start page
@@ -106,6 +126,10 @@ const dom = {
   audioDuration:    $("audioDuration"),
   reciterSelect:    $("reciterSelect"),
   audioElement:     $("audioElement"),
+  // Offline Sync
+  offlineSyncContainer: $("offlineSyncContainer"),
+  offlineSyncText:      $("offlineSyncText"),
+  offlineSyncIcon:      $("offlineSyncIcon"),
   // Toast
   toast:            $("toast"),
 };
@@ -120,6 +144,7 @@ function init() {
   bindEvents();
   bindSwipe();
   registerServiceWorker();
+  startOfflineSync();
 }
 
 function registerServiceWorker() {
@@ -130,6 +155,79 @@ function registerServiceWorker() {
         .catch((err) => console.error("[PWA] Service Worker registration failed:", err));
     });
   }
+}
+
+function startOfflineSync() {
+  const isSynced = localStorage.getItem("quranFullySynced") === "true";
+  const syncContainer = dom.offlineSyncContainer;
+  const syncText = dom.offlineSyncText;
+  const syncIcon = dom.offlineSyncIcon;
+
+  if (isSynced) {
+    if (syncContainer) syncContainer.classList.add("synced");
+    if (syncText) syncText.textContent = "المصحف جاهز بالكامل للقراءة بدون إنترنت";
+    if (syncIcon) syncIcon.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #2ec771;"></i>';
+    return;
+  }
+
+  if (!navigator.onLine) {
+    if (syncText) syncText.textContent = "أنت غير متصل بالإنترنت لمزامنة المصحف";
+    return;
+  }
+
+  let curPage = 1;
+  const totalPages = 604;
+  let syncedPagesCount = parseInt(localStorage.getItem("quranSyncedPagesCount") || "0");
+
+  caches.open("quran-mushaf-cache-v4").then(async (cache) => {
+    let batchSize = 15;
+
+    function downloadNextBatch() {
+      if (curPage > totalPages) {
+        localStorage.setItem("quranFullySynced", "true");
+        if (syncContainer) syncContainer.classList.add("synced");
+        if (syncText) syncText.textContent = "المصحف جاهز بالكامل للقراءة بدون إنترنت";
+        if (syncIcon) syncIcon.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #2ec771;"></i>';
+        return;
+      }
+
+      let promises = [];
+      let batchEnd = Math.min(curPage + batchSize - 1, totalPages);
+
+      for (let p = curPage; p <= batchEnd; p++) {
+        const url = `https://api.alquran.cloud/v1/page/${p}/quran-uthmani`;
+        promises.push(
+          cache.match(url).then((res) => {
+            if (res) {
+              return true;
+            } else {
+              return fetch(url)
+                .then((fetchRes) => {
+                  if (fetchRes.status === 200) {
+                    return cache.put(url, fetchRes.clone()).then(() => true);
+                  }
+                  return false;
+                })
+                .catch(() => false);
+            }
+          })
+        );
+      }
+
+      Promise.all(promises).then((results) => {
+        curPage += batchSize;
+        syncedPagesCount = Math.min(totalPages, Math.max(syncedPagesCount, curPage - 1));
+        localStorage.setItem("quranSyncedPagesCount", syncedPagesCount);
+
+        let percent = Math.floor((syncedPagesCount / totalPages) * 100);
+        if (syncText) syncText.textContent = `جاري تحميل المصحف أوفلاين: ${percent}%`;
+
+        setTimeout(downloadNextBatch, 1800);
+      });
+    }
+
+    downloadNextBatch();
+  });
 }
 
 // ============================================================
