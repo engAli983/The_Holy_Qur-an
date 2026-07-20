@@ -121,7 +121,7 @@ function init() {
 // ============================================================
 function applyDarkMode() {
   document.documentElement.dataset.theme = state.darkMode ? "dark" : "light";
-  dom.darkModeBtn.textContent = state.darkMode ? "☀️" : "🌙";
+  dom.darkModeBtn.innerHTML = state.darkMode ? '<i class="fa-regular fa-sun"></i>' : '<i class="fa-regular fa-moon"></i>';
 }
 function toggleDarkMode() {
   state.darkMode = !state.darkMode;
@@ -265,6 +265,15 @@ function stripBismillah(text) {
   return normText;
 }
 
+// Format Uthmani text to use Alif-Madd (أٓ) instead of Hamza-Alif (ءَا) for better print mushaf rendering
+function formatUthmaniText(text) {
+  if (!text) return "";
+  let t = text.normalize("NFC");
+  // Replace 'ءَا' (\u0621\u064e\u0627) with 'أٓ' (\u0623\u0653 - Alif with Hamza and Maddah)
+  t = t.replace(/\u0621\u064e\u0627/g, "\u0623\u0653");
+  return t;
+}
+
 // ============================================================
 // RENDER PAGE
 // ============================================================
@@ -314,6 +323,8 @@ function renderPage() {
       if (ayah.numberInSurah === 1 && surahNum !== 1 && surahNum !== 9) {
         text = stripBismillah(text);
       }
+
+      text = formatUthmaniText(text);
 
       const bm = bookmarks.find((b) => b.surah === surahNum && b.ayah === ayah.numberInSurah);
       const markerClass = bm ? `ayah-marker bm-${bm.color || "gold"}` : "ayah-marker";
@@ -479,7 +490,7 @@ function openBookmarksModal() {
           <span class="bm-surah-name">${surahName} — آية ${bm.ayah}</span>
           <span class="bm-ayah-num">صفحة ${bmPage}</span>
         </div>
-        <button class="bm-delete" onclick="delBm(${bm.surah}, ${bm.ayah})">🗑️</button>
+        <button class="bm-delete" onclick="delBm(${bm.surah}, ${bm.ayah})"><i class="fa-regular fa-trash-can"></i></button>
       `;
       dom.bookmarksList.appendChild(li);
     });
@@ -534,7 +545,7 @@ function playAudio(surahNum, ayahNum, surahName) {
   state.audioPlaying = true;
 
   dom.audioPlayer.classList.remove("hidden");
-  dom.audioPlayPauseBtn.textContent = "⏸";
+  dom.audioPlayPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
   dom.audioAyahInfo.textContent = `${surahName || `سورة ${surahNum}`} — آية ${ayahNum}`;
 
   // Use alquran.cloud audio API
@@ -553,11 +564,11 @@ function togglePlayPause() {
   if (state.audioPlaying) {
     dom.audioElement.pause();
     state.audioPlaying = false;
-    dom.audioPlayPauseBtn.textContent = "▶";
+    dom.audioPlayPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
   } else {
     dom.audioElement.play();
     state.audioPlaying = true;
-    dom.audioPlayPauseBtn.textContent = "⏸";
+    dom.audioPlayPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
   }
 }
 
