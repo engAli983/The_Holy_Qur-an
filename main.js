@@ -24,6 +24,9 @@ if (localStorage.getItem("app_cache_version") !== APP_VERSION) {
   }
 }
 
+// Global PWA Install prompt holder
+let deferredPrompt;
+
 // ============================================================
 // SURAH START PAGES — Medina Mushaf (Hafs 'an 'Asim)
 // Index = surah number (1-114), value = start page
@@ -130,9 +133,31 @@ const dom = {
   offlineSyncContainer: $("offlineSyncContainer"),
   offlineSyncText:      $("offlineSyncText"),
   offlineSyncIcon:      $("offlineSyncIcon"),
+  // PWA Install
+  pwaInstallContainer:  $("pwaInstallContainer"),
+  pwaInstallBtn:        $("pwaInstallBtn"),
   // Toast
   toast:            $("toast"),
 };
+
+// ============================================================
+// PWA INSTALL LOGIC
+// ============================================================
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (dom.pwaInstallContainer) {
+    dom.pwaInstallContainer.classList.remove("hidden");
+  }
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredPrompt = null;
+  if (dom.pwaInstallContainer) {
+    dom.pwaInstallContainer.classList.add("hidden");
+  }
+  showToast("🎉 تم تثبيت التطبيق بنجاح!");
+});
 
 // ============================================================
 // INIT
@@ -944,6 +969,23 @@ function bindEvents() {
       const { surahNum, ayahNum, surahName } = state.audioAyah;
       playAudio(surahNum, ayahNum, surahName);
     }
+  });
+
+  // Custom PWA installation button
+  dom.pwaInstallBtn.addEventListener("click", () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === "accepted") {
+        console.log("[PWA] User accepted the install prompt");
+      } else {
+        console.log("[PWA] User dismissed the install prompt");
+      }
+      deferredPrompt = null;
+      if (dom.pwaInstallContainer) {
+        dom.pwaInstallContainer.classList.add("hidden");
+      }
+    });
   });
 
   // Close popovers on outside click
