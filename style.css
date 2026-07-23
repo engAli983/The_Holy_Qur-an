@@ -436,11 +436,11 @@ body {
    NAVBAR — Glassmorphism Islamic
    ══════════════════════════════════════════════ */
 .navbar {
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  position: fixed;
   height: var(--navbar-h);
   display: flex;
   align-items: center;
